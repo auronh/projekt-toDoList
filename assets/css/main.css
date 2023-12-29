@@ -1,0 +1,14 @@
+.vertNav{
+    height: 100vh;
+    position: sticky;
+}
+.navItems:hover{
+    background-color: rgb(50, 50, 50);
+}
+a{
+    color: blue;
+    text-decoration: none;
+}
+#addTask:hover{
+    font-weight: 600;
+}
