@@ -1,6 +1,9 @@
+nav {
+  position: sticky;
+}
+
 .vertNav {
   height: 100vh;
-  position: sticky;
 }
 
 .navItems:hover {
@@ -8,8 +11,8 @@
 }
 
 a {
-  color: blue;
-  text-decoration: none;
+  color: black !important;
+  text-decoration: none !important;
 }
 
 #addTask:hover {
@@ -19,6 +22,7 @@ a {
 .checkbox {
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .checkbox__input {

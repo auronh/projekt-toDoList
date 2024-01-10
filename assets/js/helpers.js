@@ -1,12 +1,11 @@
-/* handler for print todo  */
 let listTodo = () => {
     let html = ``;
-    let data = getData(); // handler for getting item from local storage
+    let data = getData();
     if(data){
         html += `<div>`;
         data.forEach((obj,item
         ) => {
-            html += `<div class="d-flex gap-3 border-bottom px-1 mb-2">
+            html += `<div class="d-flex gap-3 border-bottom px-1 mb-2" id="${item}">
               <label class="checkbox mt-3">
                 <input type="checkbox" id="taskCheckbox" class="checkbox__input align-self-start mt-4" onclick="completeTask(${item})"/>
                 <span class="checkbox__inner"></span>
@@ -14,7 +13,10 @@ let listTodo = () => {
               <div class="taskinfo flex-fill">
                 <p class="fs-5 mb-1">${obj.title}</p>
                 <p class="fs-6 mb-2">${obj.description}</p>
-                <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>${obj.dueDate}</p>
+                <div class="taskDates d-flex justify-content-between">
+                    <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Date Created:  ${obj.dateCreated}</p>
+                    <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Due Date:  ${obj.dueDate}</p>
+                </div>
               </div>
               <div class="taskEvents">
                 <button class="btn"><i class="bi bi-pencil"></i></button>
@@ -24,16 +26,13 @@ let listTodo = () => {
         });
         html += `</div>`;
     }
-    document.getElementById("tasks").innerHTML = html;
+    if(document.querySelector("#tasks")){
+        document.querySelector("#tasks").innerHTML = html;
+    }
     priorityChecker()
 }
 
- /* handler for get todo  */
 let getData = (item = null) => {
-    /*
-    * localStorage.getItem(<itemname>) main method 
-    * (predefined method of js) for getting item from localstorage
-    */
     let data = JSON.parse(localStorage.getItem('mytodo')); 
     if(data){
 
@@ -49,10 +48,6 @@ let getData = (item = null) => {
     return false;
 }
 let getCompletedData = (item = null) => {
-    /*
-    * localStorage.getItem(<itemname>) main method 
-    * (predefined method of js) for getting item from localstorage
-    */
     let data = JSON.parse(localStorage.getItem('completedTasks')); 
     if(data){
 
@@ -68,33 +63,15 @@ let getCompletedData = (item = null) => {
     return false;
 }
 
-
- // call print handler for showing data into list 
- let priorityChecker = ()=>{
-    let myTodo = getData()
-    let html = `
-        <h5>Important tasks</h5>
-        <hr>
-    `
-    myTodo.forEach(todo =>{
-        console.log(todo.priority)
-    })
-    document.getElementById("importantTasks").innerHTML = html
-}
-listTodo();
- /* handler for set data/item todo  */
 let setData = (item) => {
     if(getData(item) != false) {
         alert("Item already added in todo");
     }else{
-        let data = getData(); // call getdata handler for getting  data from list 
+        let data = getData();
         data = (data != false) ? data : []; 
         data.push(item);
         data = JSON.stringify(data);
-        /*
-        * localStorage.setItem(<itemname>,<itemvalue>) main method 
-        * (predefined method of js) for set item into localstorage
-        */
+
         localStorage.setItem('mytodo',data);
     }
 }
@@ -103,19 +80,15 @@ let setCompleteTask = (item) => {
     if(getCompletedData(item) != false) {
         alert("Item already added in todo");
     }else{
-        let data = getCompletedData(); // call getdata handler for getting  data from list 
+        let data = getCompletedData(); 
         data = (data != false) ? data : []; 
         data.push(item);
         data = JSON.stringify(data);
-        /*
-        * localStorage.setItem(<itemname>,<itemvalue>) main method 
-        * (predefined method of js) for set item into localstorage
-        */
+
         localStorage.setItem('completedTasks',data);
     }
 }
 
-/* handler for remove item from localstorage */
 let removeData = (itemId) => {
         let data = getData();
         if(data){
@@ -129,40 +102,67 @@ let removeData = (itemId) => {
         }
 }
 
+let removeCompletedData = (itemId) => {
+    let data = getCompletedData();
+    if(data){
+        let newData = data.filter((v,i) => { return i != itemId });
+        newData = JSON.stringify(newData);
+        localStorage.setItem('completedTasks',newData);
+        listCompletedTodo();
+    }else{
+        alert("no data found");
+    }
+}
+
 let listCompletedTodo = () => {
     let html = ``;
-    let data = getCompletedData(); // handler for getting item from local storage
+    let data = getCompletedData();
     if(data){
         html += `<div>`;
         data.forEach((obj,item
         ) => {
-            html += `<div class="d-flex gap-3 border-bottom px-1 mb-2">
-              <label class="checkbox mt-3">
-                <input type="checkbox" id="taskCheckbox" class="checkbox__input align-self-start mt-4" onclick="completeTask(${item})"/>
-                <span class="checkbox__inner"></span>
-              </label>
+            html += `<div class="d-flex gap-3 border-bottom px-3 mb-2">
               <div class="taskinfo flex-fill">
                 <p class="fs-5 mb-1">${obj.title}</p>
                 <p class="fs-6 mb-2">${obj.description}</p>
-                <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>${obj.dueDate}</p>
+                <div class="taskDates d-flex justify-content-between">
+                    <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Date Created:  ${obj.dateCreated}</p>
+                    <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Date Completed:  ${obj.dateCompleted}</p>
+                </div>
               </div>
               <div class="taskEvents">
-                <button class="btn"><i class="bi bi-pencil"></i></button>
-                <button class="btn" onclick="removeData(${item})"><i class="bi bi-trash"></i></button>
+                <button class="btn" onclick="removeCompletedData(${item})"><i class="bi bi-trash"></i></button>
               </div>
             </div>`;
         });
         html += `</div>`;
     }
-    document.getElementById("completedTasks").innerHTML = html;
+    if(document.getElementById("completedTasks")){
+        document.getElementById("completedTasks").innerHTML = html;
+    }
+    
     priorityChecker()
 }
 
 
 
 let completeTask = (itemId)=>{
-    let data = getData();
-    setCompleteTask(data[itemId])
+    let toDoData = getData();
+    const api = "https://worldtimeapi.org/api/timezone/Europe/Skopje"
+    fetch(api)
+    .then(response => response.json())
+    .then(data =>{    
+        let dateArray = data.datetime.split("T")
+        let dateCompleted = dateArray[0]
+        let completedData = {
+            title: toDoData[itemId].title,
+            description: toDoData[itemId].description,
+            dateCreated: toDoData[itemId].dateCreated,
+            dateCompleted: dateCompleted.split("-").reverse().join("-")
+        }
+        setCompleteTask(completedData)
+    })
+    
     removeData(itemId)
 }
 
@@ -198,4 +198,27 @@ let addTask = (t, d, date, p) =>{
         }
     })
 }
+
+let priorityChecker = ()=>{
+    let myTodo = getData()
+    let html = `
+        <h5>Important tasks</h5>
+        <hr>
+    `
+    if(myTodo != false){
+        myTodo.forEach(obj =>{
+            if(obj.priority == true){
+                html+=`
+                <a href="./index.html" class="nav-link navItems text-white text-center">
+                    ${obj.title}
+                </a>`
+            }
+        })
+    }
+    
+    document.getElementById("importantTasks").innerHTML = html
+}
+
+listCompletedTodo()
+listTodo();
 
