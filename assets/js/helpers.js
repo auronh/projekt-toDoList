@@ -5,23 +5,25 @@ let listTodo = () => {
         html += `<div>`;
         data.forEach((obj,item
         ) => {
-            html += `<div class="d-flex gap-3 border-bottom px-1 mb-2" id="${item}">
-              <label class="checkbox mt-3">
-                <input type="checkbox" id="taskCheckbox" class="checkbox__input align-self-start mt-4" onclick="completeTask(${item})"/>
-                <span class="checkbox__inner"></span>
-              </label>
-              <div class="taskinfo flex-fill">
-                <p class="fs-5 mb-1">${obj.title}</p>
-                <p class="fs-6 mb-2">${obj.description}</p>
-                <div class="taskDates d-flex justify-content-between">
-                    <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Date Created:  ${obj.dateCreated}</p>
-                    <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Due Date:  ${obj.dueDate}</p>
+            html += `<div id="task${item}">
+                <div class="gap-3 border-bottom px-1 mb-2" id="${item}" style="display: flex;">
+                  <label class="checkbox mt-3">
+                    <input type="checkbox" id="taskCheckbox" class="checkbox__input align-self-start mt-4" onclick="completeTask(${item})"/>
+                    <span class="checkbox__inner"></span>
+                  </label>
+                  <div class="taskinfo flex-fill">
+                    <p class="fs-5 mb-1">${obj.title}</p>
+                    <p class="fs-6 mb-2">${obj.description}</p>
+                    <div class="taskDates d-flex justify-content-between">
+                        <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Date Created:  ${obj.dateCreated}</p>
+                        <p class="d-flex gap-1" style="font-size: 12px;"><i class="bi bi-calendar-event"></i>Due Date:  ${obj.dueDate}</p>
+                    </div>
+                  </div>
+                  <div class="taskEvents">
+                    <button class="btn" onclick="editMenu(${item})"><i class="bi bi-pencil"></i></button>
+                    <button class="btn" onclick="removeData(${item})"><i class="bi bi-trash"></i></button>
+                  </div>
                 </div>
-              </div>
-              <div class="taskEvents">
-                <button class="btn"><i class="bi bi-pencil"></i></button>
-                <button class="btn" onclick="removeData(${item})"><i class="bi bi-trash"></i></button>
-              </div>
             </div>`;
         });
         html += `</div>`;
@@ -194,9 +196,51 @@ let addTask = (t, d, date, p) =>{
             setData(obj)
             listTodo()
             priorityChecker()
-        
         }
     })
+}
+
+let editMenu = (item) => {
+    let data = getData()
+    
+    document.getElementById(`task${item}`).innerHTML +=`
+    <div id="editMenu" class="border p-3 rounded mb-3">
+            <div class="textInput d-flex flex-column gap-1 mb-2">
+              <input type="text" id="editTitle" placeholder="${data[item].title}" value="${data[item].title}" class="p-1 border" required>
+              <input type="text" id="editDescription" placeholder="${data[item].description}" value="${data[item].description}" class="p-1 border" style="border: 0;">
+            </div>
+            <div class="d-flex gap-3">
+              <input type="text" id="editDate" placeholder="Due Date" value="${data[item].dueDate}" onfocus="(this.type='date')" onblur="(this.type='text')" class="px-2" required> 
+            </div>
+            <hr>
+        <button id="cancelEdit" onclick="cancelEdit(${item})" class="btn btn-secondary">Cancel</button>
+        <button id="editTaskBtn" onclick="editTask(${item})" class="btn btn-success">Edit Task</button>
+    </div>
+    `
+    document.getElementById(item).style.display = "none"
+}
+
+let editTask = (item) =>{
+    let data = getData()
+    let newObj = {
+        title: document.getElementById("editTitle").value,
+        description: document.getElementById("editDescription").value,
+        dueDate: document.getElementById("editDate").value.split("-").reverse().join("-"),
+        priority: data[item].priority,
+        dateCreated: data[item].dateCreated
+    }
+    newObj = JSON.parse(JSON.stringify(newObj)) 
+
+    
+    setData(newObj)
+    removeData(item)
+    listTodo()
+    
+}
+
+let cancelEdit = (item)=>{
+    document.getElementById(item).style.display = "flex"
+    document.getElementById("editMenu").remove()
 }
 
 let priorityChecker = ()=>{
@@ -221,4 +265,3 @@ let priorityChecker = ()=>{
 
 listCompletedTodo()
 listTodo();
-
